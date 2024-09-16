@@ -1,0 +1,55 @@
+import math
+
+#List of constants:
+mew_Sun = 1.327 * 10**11 #km3/s2#
+Sun_to_Earth = 1.496 * 10**8 #km#
+Speed_Earth_WRT_Sun = 29.7222222 #km/s#
+Sun_to_Venus = 108.22 * 10**6 #km#
+Speed_Venus_WRT_Sun = 35.0213889 #km/s#
+Sun_to_Mercury = 47.146 * 10**6 #km#
+Speed_Mercury_WRT_Sun = 47 #km/s#
+Radius_Mercury = 2438.3 #km#
+mew_Mercury = 0.022032 * 10**6 #km3/s2#
+Initial_velocity_WRT_Earth = 3.5 #km/s#
+
+#Functions:
+
+def semimajoraxis (ra,rp):
+    a = (ra + rp) / 2
+    return a
+
+def speed (mew,r,a):
+    speed_squared = mew*((2/r)-(1/a))
+    speed = math.sqrt(speed_squared)
+    return speed
+
+def speedcirc (mew,a):
+    speed_squared2 = mew/a
+    speed2 = math.sqrt(speed_squared2)
+    return speed2
+
+#Earth to Venus
+EV_semimajoraxis = semimajoraxis (Sun_to_Earth,Sun_to_Venus)
+EV_V_apocenter = speed (mew_Sun, Sun_to_Earth, EV_semimajoraxis) + Initial_velocity_WRT_Earth
+EV_V_pericenter = speed (mew_Sun, Sun_to_Venus, EV_semimajoraxis)
+
+#Venus to Mercury
+VM_semimajoraxis = semimajoraxis (Sun_to_Venus,Sun_to_Mercury)
+VM_V_apocenter = speed (mew_Sun, Sun_to_Venus, VM_semimajoraxis)
+VM_V_pericenter = speed (mew_Sun, Sun_to_Mercury, VM_semimajoraxis)
+
+#Polar Orbit around Mercury
+M_semimajoraxis = Radius_Mercury
+M_Vcirc = speedcirc(mew_Mercury,M_semimajoraxis)
+
+#Delta V needed to make the Venus Transfer
+VV_DeltaV = VM_V_apocenter - EV_V_pericenter
+
+#Delta V needed to make the Mercury Orbit Insertion
+MM_DeltaV = VM_V_pericenter - Speed_Mercury_WRT_Sun - M_Vcirc
+
+print("Speed when arriving at Venus (WRT to Venus):", EV_V_pericenter - Speed_Venus_WRT_Sun)
+print("Delta V needed at Venus to change orbit:", VV_DeltaV)
+print("Speed when arriving at Mercury (WRT to Mercury):", MM_DeltaV + M_Vcirc)
+print("Delta V needed to circularize the orbit at Mercury:", MM_DeltaV)
+print("Total Delta V needed:", abs(VV_DeltaV) + abs(MM_DeltaV))
